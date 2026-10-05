@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create your account - Cricket ECO Solutions</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <img class="brand-icon" src="assets/cricket-sa-icon-512.png" alt="">
+        <span class="brand-text"><span class="brand-name">Cricket ECO</span><span class="brand-sub">Solutions</span></span>
+      </a>
+      <nav class="nav-links"><a href="login.html" id="login-instead-link">Log in instead</a></nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container form-card">
+      <h1 class="section-title">Create your federation account</h1>
+      <p class="section-sub">Use this account to review modules, upload discovery documents and track onboarding status.</p>
+      <div id="alert-box"></div>
+      <form id="register-form" class="card">
+        <div class="field">
+          <label for="full_name">Full name</label>
+          <input id="full_name" required type="text" placeholder="e.g. Thandiwe Nkosi">
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="email">Email address</label>
+            <input id="email" required type="email" placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" type="tel" placeholder="+27 ...">
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="country_of_residence">Country you currently live in</label>
+            <input id="country_of_residence" list="country-list" required placeholder="Start typing...">
+            <datalist id="country-list"></datalist>
+          </div>
+          <div class="field">
+            <label for="city_of_residence">City / town</label>
+            <select id="city_of_residence"><option value="">Choose a country first...</option></select>
+            <input id="city_of_residence_other" class="hidden" placeholder="Type your city / town" style="margin-top:8px;">
+          </div>
+        </div>
+        <p class="hint mt-0">Add the organisation location that should be used for discovery planning. You can update this later.</p>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" required type="password" minlength="8" placeholder="At least 8 characters">
+        </div>
+        <button class="btn btn-solid" type="submit" style="width:100%;">Create account</button>
+      </form>
+    </div>
+  </section>
+
+  <script src="js/countries.js"></script>
+  <script src="js/city-picker.js"></script>
+  <script src="js/seed-data.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const form = document.getElementById('register-form');
+    const alertBox = document.getElementById('alert-box');
+    const next = new URLSearchParams(window.location.search).get('next');
+    if (next) {
+      document.getElementById('login-instead-link').href = `login.html?next=${encodeURIComponent(next)}`;
+    }
+    document.getElementById('country-list').innerHTML = COUNTRIES.map((c) => `<option value="${c}">`).join('');
+    const city = wireCityPicker('country_of_residence', 'city_of_residence', 'city_of_residence_other');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.innerHTML = '';
+      try {
+        await Api.register({
+          full_name: document.getElementById('full_name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          password: document.getElementById('password').value,
+          country_of_residence: document.getElementById('country_of_residence').value.trim(),
+          city_of_residence: city.getCity(),
+        });
+        window.location.href = next || 'roles.html';
+      } catch (err) {
+        alertBox.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    });
+  </script>
+</body>
+</html>

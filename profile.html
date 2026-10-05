@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My account - Cricket ECO Solutions</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <img class="brand-icon" src="assets/cricket-sa-icon-512.png" alt="">
+        <span class="brand-text"><span class="brand-name">Cricket ECO</span><span class="brand-sub">Solutions</span></span>
+      </a>
+      <nav class="nav-links"><a href="dashboard.html">My dashboard</a></nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container form-card">
+      <h1 class="section-title">My account</h1>
+      <p class="section-sub">Keep your organisation and location details up to date for discovery planning.</p>
+      <div id="alert-box"></div>
+      <form id="profile-form" class="card">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" disabled>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="full_name">Full name</label>
+            <input id="full_name" required type="text">
+          </div>
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" type="tel">
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="country_of_residence">Country you currently live in</label>
+            <input id="country_of_residence" list="country-list" required>
+            <datalist id="country-list"></datalist>
+          </div>
+          <div class="field">
+            <label for="city_of_residence">City / town</label>
+            <select id="city_of_residence"><option value="">Choose a country first...</option></select>
+            <input id="city_of_residence_other" class="hidden" placeholder="Type your city / town" style="margin-top:8px;">
+          </div>
+        </div>
+        <button class="btn btn-solid" type="submit">Save changes</button>
+      </form>
+    </div>
+  </section>
+
+  <script src="js/countries.js"></script>
+  <script src="js/city-picker.js"></script>
+  <script src="js/seed-data.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    (async function () {
+      let user;
+      try { ({ user } = await Api.me()); } catch { window.location.href = 'login.html?next=' + encodeURIComponent('profile.html'); return; }
+
+      document.getElementById('country-list').innerHTML = COUNTRIES.map((c) => `<option value="${c}">`).join('');
+      const city = wireCityPicker('country_of_residence', 'city_of_residence', 'city_of_residence_other');
+
+      document.getElementById('email').value = user.email;
+      document.getElementById('full_name').value = user.full_name;
+      document.getElementById('phone').value = user.phone || '';
+      document.getElementById('country_of_residence').value = user.country_of_residence || '';
+      city.setCity(user.city_of_residence || '');
+
+      const alertBox = document.getElementById('alert-box');
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.innerHTML = '';
+        try {
+          await Api.updateProfile({
+            full_name: document.getElementById('full_name').value,
+            phone: document.getElementById('phone').value,
+            country_of_residence: document.getElementById('country_of_residence').value.trim(),
+            city_of_residence: city.getCity(),
+          });
+          alertBox.innerHTML = '<div class="alert alert-ok">Saved. <a href="roles.html">View modules</a></div>';
+        } catch (err) {
+          alertBox.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

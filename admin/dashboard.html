@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Platform admin - Cricket ECO Solutions</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="dashboard.html">
+        <img class="brand-icon" src="../assets/cricket-sa-icon-512.png" alt="">
+        <span class="brand-text"><span class="brand-name">Cricket ECO</span><span class="brand-sub">Solutions</span></span>
+      </a>
+      <nav class="nav-links">
+        <span class="muted" id="who"></span>
+        <a href="#" id="logout-link">Log out</a>
+      </nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+      <h1 class="section-title">Platform onboarding dashboard</h1>
+      <p class="section-sub mt-0" id="mode-note"></p>
+      <div class="stat-row" id="stats"></div>
+      <div class="admin-toolbar" id="data-toolbar" style="margin-bottom:24px;">
+        <button class="btn btn-ghost btn-sm" id="export-data-btn">Export data (JSON)</button>
+        <button class="btn btn-ghost btn-sm" id="import-data-btn">Import data (JSON)</button>
+        <input type="file" id="import-data-input" accept="application/json" class="hidden">
+      </div>
+
+      <div class="admin-toolbar">
+        <select id="f-status">
+          <option value="">All statuses</option>
+          <option value="submitted">Submitted</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="interview_invited">Interview invited</option>
+          <option value="interview_scheduled">Interview scheduled</option>
+          <option value="offered">Offered</option>
+          <option value="rejected_auto">Rejected (auto)</option>
+          <option value="rejected_manual">Rejected (manual)</option>
+          <option value="withdrawn">Withdrawn</option>
+        </select>
+        <select id="f-role"><option value="">All modules</option></select>
+        <input id="f-country" type="text" placeholder="Country contains...">
+        <input id="f-q" type="text" placeholder="Search name or email...">
+        <button class="btn btn-ghost btn-sm" id="f-apply">Filter</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Contact</th><th>Module</th><th>Country</th><th>Pilot hub</th><th>Score</th><th>Status</th><th>Created</th></tr>
+          </thead>
+          <tbody id="rows"><tr><td colspan="7" class="muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+      <div id="pager" style="margin-top:12px;"></div>
+    </div>
+  </section>
+
+  <div class="modal-backdrop hidden" id="modal-backdrop">
+    <div class="modal" id="modal-body"></div>
+  </div>
+
+  <script src="../js/seed-data.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/admin.js"></script>
+</body>
+</html>
