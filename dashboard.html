@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My onboarding - Cricket ECO Solutions</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <img class="brand-icon" src="assets/cricket-sa-icon-512.png" alt="">
+        <span class="brand-text"><span class="brand-name">Cricket ECO</span><span class="brand-sub">Solutions</span></span>
+      </a>
+      <nav class="nav-links">
+        <span class="muted" id="who"></span>
+        <a href="profile.html">My account</a>
+        <a href="#" id="logout-link">Log out</a>
+      </nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container form-card" style="max-width:680px;">
+      <h1 class="section-title">My onboarding</h1>
+      <div id="content"><p class="muted">Loading...</p></div>
+    </div>
+  </section>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const STATUS_LABEL = {
+      draft: 'Draft - not yet submitted',
+      submitted: 'Submitted',
+      shortlisted: 'Shortlisted',
+      rejected_auto: 'Not progressing',
+      rejected_manual: 'Not progressing',
+      interview_invited: 'Interview invited',
+      interview_scheduled: 'Interview scheduled',
+      offered: 'Discovery approved',
+      withdrawn: 'Withdrawn',
+    };
+
+    (async function () {
+      let user;
+      try { ({ user } = await Api.me()); } catch { window.location.href = 'login.html'; return; }
+      if (user.role === 'admin') { window.location.href = 'admin/dashboard.html'; return; }
+      document.getElementById('who').textContent = user.full_name;
+      document.getElementById('logout-link').addEventListener('click', async (e) => {
+        e.preventDefault(); await Api.logout(); window.location.href = 'index.html';
+      });
+
+      const content = document.getElementById('content');
+      const { application, documents, interview } = await Api.myApplication();
+
+      if (!application) {
+        content.innerHTML = `<div class="card"><p>You have not started an onboarding request yet.</p><a class="btn btn-solid" href="roles.html">Browse modules</a></div>`;
+        return;
+      }
+
+      if (application.status === 'draft') {
+        content.innerHTML = `<div class="card"><p>You have an onboarding request in progress for <strong>${application.role_name}</strong>.</p><a class="btn btn-solid" href="apply.html">Continue my request</a></div>`;
+        return;
+      }
+
+      let interviewHtml = '';
+      if (interview) {
+        const when = interview.scheduled_at ? new Date(interview.scheduled_at).toLocaleString('en-ZA', { dateStyle: 'full', timeStyle: 'short' }) : 'To be confirmed';
+        interviewHtml = `
+          <div class="card" style="margin-top:16px;">
+            <h3 class="mt-0">Discovery workshop</h3>
+            <p><strong>When:</strong> ${when}</p>
+            ${interview.meeting_link ? `<p><strong>Link:</strong> <a href="${interview.meeting_link}" target="_blank" rel="noopener">${interview.meeting_link}</a></p>` : ''}
+          </div>`;
+      }
+
+      const docsHtml = (documents || []).map((d) => `<li>${d.doc_type.replace('_',' ')} - ${d.original_name}</li>`).join('');
+
+      content.innerHTML = `
+        <div class="card">
+          <span class="badge badge-${application.status}">${STATUS_LABEL[application.status] || application.status}</span>
+          <h3>${application.role_name}</h3>
+          <p class="muted">${application.venue_name ? `Preferred pilot hub: ${application.venue_name} (${application.venue_city})` : 'No pilot hub preference set'}</p>
+          ${application.screening_score != null ? `<p>Readiness score: <strong>${application.screening_score}%</strong></p>` : ''}
+          <p class="muted">Discovery documents submitted:</p>
+          <ul>${docsHtml || '<li>None</li>'}</ul>
+          ${['draft','submitted'].includes(application.status) ? `<button class="btn btn-ghost btn-sm" id="withdraw-btn">Withdraw request</button>` : ''}
+        </div>
+        ${interviewHtml}
+      `;
+
+      const withdrawBtn = document.getElementById('withdraw-btn');
+      if (withdrawBtn) withdrawBtn.addEventListener('click', async () => {
+        if (!confirm('Withdraw your onboarding request? This cannot be undone.')) return;
+        await Api.withdraw(application.id);
+        window.location.reload();
+      });
+    })();
+  </script>
+</body>
+</html>

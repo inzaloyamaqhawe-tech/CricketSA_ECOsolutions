@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in - Cricket ECO Solutions</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <img class="brand-icon" src="assets/cricket-sa-icon-512.png" alt="">
+        <span class="brand-text"><span class="brand-name">Cricket ECO</span><span class="brand-sub">Solutions</span></span>
+      </a>
+      <nav class="nav-links"><a href="register.html" id="create-account-link">Create an account</a></nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container form-card">
+      <h1 class="section-title">Log in</h1>
+      <p class="section-sub">Applicants and recruitment admins both log in here.</p>
+      <div id="alert-box"></div>
+      <form id="login-form" class="card">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" required type="email" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" required type="password">
+        </div>
+        <button class="btn btn-solid" type="submit" style="width:100%;">Log in</button>
+      </form>
+    </div>
+  </section>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const alertBox = document.getElementById('alert-box');
+    const next = new URLSearchParams(window.location.search).get('next');
+    if (next) {
+      const createLink = document.getElementById('create-account-link');
+      createLink.href = `register.html?next=${encodeURIComponent(next)}`;
+    }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.innerHTML = '';
+      try {
+        const { user } = await Api.login({
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value,
+        });
+        if (user.role === 'admin') { window.location.href = 'admin/dashboard.html'; return; }
+        window.location.href = next || 'dashboard.html';
+      } catch (err) {
+        alertBox.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
