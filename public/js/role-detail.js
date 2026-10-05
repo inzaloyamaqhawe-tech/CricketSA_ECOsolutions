@@ -14,6 +14,16 @@
   document.title = `${module.name} - Cricket ECO Solutions`;
   const outcomesHtml = (module.minQualifications || []).map((q) => `<li>${q}</li>`).join('');
   const featuresHtml = (module.coreDuties || []).map((d) => `<li>${d}</li>`).join('');
+  const applyUrl = `apply.html?role=${module.id}`;
+  let startHref = `register.html?next=${encodeURIComponent(applyUrl)}`;
+  let startText = 'Create account to start onboarding';
+  try {
+    await Api.me();
+    startHref = applyUrl;
+    startText = 'Start federation onboarding';
+  } catch {
+    // Logged-out users will create an account first, then return to this module.
+  }
 
   box.innerHTML = `
     <div class="card module-detail">
@@ -28,7 +38,7 @@
       <ul>${featuresHtml}</ul>
 
       <div style="margin-top:24px;">
-        <a class="btn btn-primary" href="register.html">Start federation onboarding</a>
+        <a class="btn btn-primary" href="${startHref}">${startText}</a>
         <a class="btn btn-ghost" href="roles.html">Back to modules</a>
       </div>
     </div>
