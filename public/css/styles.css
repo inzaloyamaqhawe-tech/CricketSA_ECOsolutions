@@ -246,7 +246,7 @@ table.admin-table tr { cursor: pointer; }
   gap: 8px;
   margin-top: 14px;
 }
-.pipeline span {
+.pipeline a {
   background: var(--green);
   color: var(--white);
   border-radius: 8px;
@@ -254,6 +254,13 @@ table.admin-table tr { cursor: pointer; }
   text-align: center;
   font-size: 12px;
   font-weight: 700;
+  text-decoration: none;
+}
+.pipeline a:hover,
+.pipeline a:focus {
+  background: var(--green-dark);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 .eco-diagram {
   display: grid;
