@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Clickability audit</title>
+<pre id="out">Running...</pre>
+<script>
+(async function () {
+  const base = 'http://127.0.0.1:4178/public/';
+  const pages = ['index.html', 'roles.html', 'role.html?id=1', 'register.html', 'login.html', 'dashboard.html', 'admin/dashboard.html'];
+  const viewports = [
+    { name: 'desktop', width: 1366, height: 900 },
+    { name: 'mobile', width: 390, height: 844 },
+  ];
+  const findings = [];
+
+  function auditDocument(page, viewport) {
+    const controls = [...document.querySelectorAll('a, button, input[type="button"], input[type="submit"]')];
+    return controls.map((el) => {
+      const rect = el.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const top = document.elementFromPoint(cx, cy);
+      const href = el.tagName === 'A' ? el.getAttribute('href') : '';
+      const label = (el.innerText || el.value || el.getAttribute('aria-label') || href || el.id || el.tagName).trim().replace(/\s+/g, ' ');
+      const problems = [];
+
+      if (rect.width < 1 || rect.height < 1) problems.push('zero-size');
+      if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) problems.push('hidden');
+      if (el.disabled) problems.push('disabled');
+      if (el.tagName === 'A' && (!href || href === '#')) problems.push('bad-href');
+      if (cx < 0 || cy < 0 || cx > innerWidth || cy > innerHeight) {
+        problems.push('off-first-viewport');
+      } else if (top && top !== el && !el.contains(top) && !top.contains(el)) {
+        problems.push(`covered-by-${top.tagName.toLowerCase()}${top.id ? '#' + top.id : ''}`);
+      }
+
+      return { page, viewport, label, tag: el.tagName.toLowerCase(), href, problems };
+    }).filter((x) => x.problems.length);
+  }
+
+  for (const viewport of viewports) {
+    for (const page of pages) {
+      await new Promise((resolve) => {
+        const frame = document.createElement('iframe');
+        frame.style.width = viewport.width + 'px';
+        frame.style.height = viewport.height + 'px';
+        frame.style.border = '0';
+        frame.onload = () => {
+          try {
+            findings.push(...frame.contentWindow.eval(`(${auditDocument.toString()})(${JSON.stringify(page)}, ${JSON.stringify(viewport.name)})`));
+          } catch (error) {
+            findings.push({ page, viewport: viewport.name, label: 'page script', tag: 'iframe', href: '', problems: [error.message] });
+          }
+          frame.remove();
+          resolve();
+        };
+        frame.src = base + page;
+        document.body.appendChild(frame);
+      });
+    }
+  }
+
+  document.getElementById('out').textContent = JSON.stringify({ ok: findings.length === 0, findings }, null, 2);
+})();
+</script>

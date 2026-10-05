@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Federation onboarding - Cricket ECO Solutions</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <img class="brand-icon" src="assets/cricket-sa-icon-512.png" alt="">
+        <span class="brand-text"><span class="brand-name">Cricket ECO</span><span class="brand-sub">Solutions</span></span>
+      </a>
+      <nav class="nav-links"><a href="dashboard.html">My dashboard</a></nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container form-card" style="max-width:680px;">
+      <h1 class="section-title mt-0" style="margin-bottom:2px;">Federation onboarding</h1>
+      <p class="section-sub" id="role-banner">Loading module...</p>
+      <div class="stepper">
+        <div class="step" data-step="1">1. Scope</div>
+        <div class="step" data-step="2">2. Documents</div>
+        <div class="step" data-step="3">3. Readiness</div>
+      </div>
+      <div id="alert-box"></div>
+
+      <!-- Step 1: venue preference + about you -->
+      <div id="step-1" class="card">
+        <div class="field">
+          <label for="venue_id">Preferred pilot hub</label>
+          <select id="venue_id"><option value="">No preference</option></select>
+          <p class="hint">Choose the office, hub or club where discovery should start.</p>
+        </div>
+        <div class="field">
+          <label for="date_of_birth">Target go-live date</label>
+          <input id="date_of_birth" type="date">
+        </div>
+        <div class="field">
+          <label for="motivation">What problem should this module solve first?</label>
+          <textarea id="motivation" placeholder="A few sentences is fine"></textarea>
+        </div>
+        <div class="field">
+          <label for="availability_notes">Stakeholder and rollout notes</label>
+          <textarea id="availability_notes" placeholder="e.g. Board, selectors, club admins, coaches, pilot clubs"></textarea>
+        </div>
+        <button class="btn btn-solid" id="to-step-2">Save &amp; continue</button>
+      </div>
+
+      <!-- Step 2: documents -->
+      <div id="step-2" class="card hidden">
+        <p class="section-sub mt-0">Upload useful discovery files such as existing spreadsheets, policy packs, fixture lists or certificate registers (PDF, JPG or PNG, max 8&nbsp;MB each).</p>
+        <div class="field">
+          <label>Current records sample</label>
+          <div class="upload-box" id="box-cv">
+            <input type="file" id="file-cv" accept=".pdf,.jpg,.jpeg,.png">
+            <div class="upload-status" id="status-cv">No file uploaded yet</div>
+          </div>
+          <div id="cv-scan-result"></div>
+        </div>
+        <div class="field">
+          <label>Governance or policy document</label>
+          <div class="upload-box" id="box-police_clearance">
+            <input type="file" id="file-police_clearance" accept=".pdf,.jpg,.jpeg,.png">
+            <div class="upload-status" id="status-police_clearance">No file uploaded yet</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Extra reference document <span class="muted">(optional)</span></label>
+          <div class="upload-box" id="box-id_document">
+            <input type="file" id="file-id_document" accept=".pdf,.jpg,.jpeg,.png">
+            <div class="upload-status" id="status-id_document">No file uploaded yet</div>
+          </div>
+        </div>
+        <button class="btn btn-solid" id="to-step-3">Continue to readiness questions</button>
+      </div>
+
+      <!-- Step 3: screening quiz -->
+      <div id="step-3" class="card hidden">
+        <p class="section-sub mt-0">Answer every readiness question, then submit. The dashboard will show whether this module is ready for discovery.</p>
+        <div id="questions"></div>
+        <button class="btn btn-solid" id="submit-screening">Submit onboarding request</button>
+      </div>
+
+      <!-- Result -->
+      <div id="step-result" class="card hidden"></div>
+    </div>
+  </section>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/api.js"></script>
+  <script type="module" src="js/pdf-extract.js"></script>
+  <script src="js/apply.js"></script>
+</body>
+</html>

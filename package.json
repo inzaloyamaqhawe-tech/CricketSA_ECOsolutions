@@ -1,0 +1,25 @@
+{
+  "name": "cricket-eco-solutions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cricket ECO Solutions platform prototype for federation modules, onboarding, document upload, readiness screening and admin review.",
+  "type": "commonjs",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "seed": "node server/sql/run-seed.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.11.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cookie-parser": "^1.4.6",
+    "multer": "^2.0.0",
+    "nodemailer": "^6.9.13",
+    "express-rate-limit": "^7.2.0"
+  }
+}
